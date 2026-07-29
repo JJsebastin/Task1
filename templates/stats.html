@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Group Standings – PlayStats FIFA 2026{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-table"></i> Group Standings</h1>
+  <p>FIFA World Cup 2026 · 12 Groups · 48 Teams · Top 2 + 8 best 3rd advance</p>
+</div>
+
+<div class="groups-grid">
+{% for grp, rows in standings.items() %}
+<div class="group-card tilt-card" data-tilt data-tilt-max="5">
+  <div class="group-header">Group {{ grp }}</div>
+  <table class="standings-table">
+    <thead>
+      <tr><th>Team</th><th>P</th><th>W</th><th>D</th><th>L</th><th>GD</th><th>Pts</th></tr>
+    </thead>
+    <tbody>
+      {% for t in rows %}
+      <tr class="{% if loop.index0 < 2 %}qualified{% endif %}">
+        <td class="team-cell">
+          <span>{{ t.flag }}</span>
+          <a href="/stats/{{ t.team }}" class="team-link">{{ t.team }}</a>
+        </td>
+        <td>{{ t.played }}</td>
+        <td>{{ t.won }}</td>
+        <td>{{ t.drawn }}</td>
+        <td>{{ t.lost }}</td>
+        <td class="{{ 'pos' if t.gd > 0 else ('neg' if t.gd < 0 else '') }}">{{ '+' if t.gd > 0 else '' }}{{ t.gd }}</td>
+        <td class="pts-cell">{{ t.pts }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="qual-legend"><span class="qual-dot"></span> Advance to Round of 32</div>
+</div>
+{% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>{% block title %}PlayStats – FIFA 2026{% endblock %}</title>
+<meta name="description" content="Live FIFA 2026 World Cup stats, scores, and visualizations"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}"/>
+{% block extra_css %}{% endblock %}
+</head>
+<body>
+
+<!-- Animated background -->
+<div class="bg-orbs">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+</div>
+
+<!-- Navbar -->
+<nav class="navbar">
+  <div class="nav-inner">
+    <a href="{{ url_for('main.index') }}" class="nav-brand">
+      <span class="brand-icon">⚽</span>
+      <span class="brand-text">Play<span class="accent">Stats</span></span>
+      <span class="badge-live">🇪🇸 Spain Champions</span>
+    </a>
+    <div class="nav-links">
+      <a href="{{ url_for('main.index') }}"         class="nav-link {% if request.endpoint=='main.index' %}active{% endif %}"><i class="fa fa-home"></i> Home</a>
+      <a href="{{ url_for('main.matches') }}"       class="nav-link {% if request.endpoint=='main.matches' %}active{% endif %}"><i class="fa fa-futbol"></i> Matches</a>
+      <a href="{{ url_for('main.stats') }}"         class="nav-link {% if request.endpoint in ['main.stats','main.team_detail'] %}active{% endif %}"><i class="fa fa-table"></i> Standings</a>
+      <a href="{{ url_for('main.players') }}"       class="nav-link {% if request.endpoint=='main.players' %}active{% endif %}"><i class="fa fa-user-group"></i> Players</a>
+      <a href="{{ url_for('main.visualization') }}" class="nav-link {% if request.endpoint=='main.visualization' %}active{% endif %}"><i class="fa fa-chart-bar"></i> Dashboard</a>
+    </div>
+    <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')">
+      <i class="fa fa-bars"></i>
+    </button>
+  </div>
+</nav>
+
+<!-- Page content -->
+<main class="page-content">
+  {% block content %}{% endblock %}
+</main>
+
+<!-- Footer -->
+<footer class="footer">
+  <p>⚽ PlayStats · FIFA World Cup 2026 · 🏆 Spain Champions · Built with Flask &amp; Chart.js</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js"></script>
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

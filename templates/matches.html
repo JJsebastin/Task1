@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Matches – PlayStats FIFA 2026{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-futbol"></i> All Matches</h1>
+  <p>FIFA World Cup 2026 · 104 matches · June 11 – July 19, 2026</p>
+</div>
+
+<!-- Stage tabs -->
+<div class="tabs">
+  {% for stage in grouped %}
+  {% if grouped[stage] %}
+  <button class="tab-btn {% if stage=='Final' %}tab-final{% endif %} {% if loop.first %}active{% endif %}" onclick="showTab('{{ stage|replace(' ','_') }}',this)">
+    {% if stage=='Final' %}🏆 {% endif %}{{ stage }}
+    <span class="tab-count">{{ grouped[stage]|length }}</span>
+  </button>
+  {% endif %}
+  {% endfor %}
+</div>
+
+{% for stage, mlist in grouped.items() %}
+{% if mlist %}
+<div id="tab_{{ stage|replace(' ','_') }}" class="tab-panel {% if loop.first %}active{% endif %}">
+  <div class="match-grid {% if stage not in ['Group Stage'] %}big{% endif %}">
+    {% for m in mlist %}
+    <div class="match-card tilt-card {% if stage=='Final' %}final-match-card{% endif %}" data-tilt data-tilt-max="6">
+      <div class="match-top-row">
+        {% if m.group != '-' %}<span class="group-tag">Group {{ m.group }}</span>{% endif %}
+        <span class="match-date">{{ m.date }}</span>
+        <span class="status-badge {{ 'ft' if m.status=='FT' else 'tbd' }}">{{ m.status }}</span>
+      </div>
+      <div class="match-teams">
+        <div class="team-side">
+          <span class="flag lg">{{ m.team1.flag }}</span>
+          <span class="tname">{{ m.team1.name }}</span>
+        </div>
+        <div class="score-box">
+          {% if m.status=='FT' %}
+          <span class="score {% if stage=='Final' %}score-final{% endif %}">{{ m.score1 }} – {{ m.score2 }}</span>
+          {% if stage=='Final' %}<span class="aet-label">AET</span>{% endif %}
+          {% else %}
+          <span class="score vs">VS</span>
+          {% endif %}
+        </div>
+        <div class="team-side right">
+          <span class="flag lg">{{ m.team2.flag }}</span>
+          <span class="tname">{{ m.team2.name }}</span>
+        </div>
+      </div>
+      <div class="match-meta"><i class="fa fa-location-dot"></i> {{ m.venue }}</div>
+      {% if stage=='Final' %}
+      <div class="match-final-label">🏆 FIFA World Cup 2026 Final</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.tab-count{background:rgba(0,0,0,0.08);border-radius:99px;padding:.1rem .5rem;font-size:.75rem;margin-left:.3rem}
+.tab-final{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important}
+.final-match-card{border:2px solid var(--green)!important;box-shadow:0 8px 30px rgba(16,185,129,.2)!important}
+.score-final{color:var(--green-dark)!important;font-size:2.8rem!important}
+.aet-label{font-size:.8rem;color:var(--green-dark);font-weight:700;background:var(--green-light);padding:.3rem .8rem;border-radius:99px;margin-top:.5rem}
+.match-final-label{text-align:center;color:var(--green-dark);font-weight:700;font-size:.85rem;background:var(--green-light);padding:.6rem;border-radius:12px;margin-top:.5rem}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab_' + id).classList.add('active');
+  btn.classList.add('active');
+}
+</script>
+{% endblock %}

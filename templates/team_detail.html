@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}{{ team }} – Team Stats{% endblock %}
+{% block content %}
+<a href="/stats" class="back-btn"><i class="fa fa-arrow-left"></i> Back to Standings</a>
+<div class="page-header">
+  <h1>{{ ts.get('flag','') }} {{ team }}</h1>
+  <p>FIFA World Cup 2026 · Team Statistics</p>
+</div>
+
+<div class="team-detail-grid">
+  <!-- Stats cards row (like screenshot) -->
+  <div class="stat-section glass">
+    <div class="stat-section-title"><span class="bar-accent"></span>GAMES</div>
+    <div class="stat-big-row">
+      <div class="stat-big-box blue-box">
+        <div class="stat-big-label">Total games played</div>
+        <div class="stat-big-num">{{ team_matches|length }}</div>
+      </div>
+      <div class="bar-stats">
+        {% set won   = team_matches | selectattr('score1','gt',0) | list | length %}
+        <div class="bar-row"><span>Won</span>   <div class="bar-track"><div class="bar-fill green"  style="width:{{ (ts.won   / team_matches|length * 100)|int if team_matches else 0 }}%"></div></div><span class="bar-val">{{ ts.get('won',0) }}</span></div>
+        <div class="bar-row"><span>Drawn</span> <div class="bar-track"><div class="bar-fill grey"   style="width:{{ (ts.drawn / team_matches|length * 100)|int if team_matches else 0 }}%"></div></div><span class="bar-val">{{ ts.get('drawn',0) }}</span></div>
+        <div class="bar-row"><span>Lost</span>  <div class="bar-track"><div class="bar-fill red"    style="width:{{ (ts.lost  / team_matches|length * 100)|int if team_matches else 0 }}%"></div></div><span class="bar-val">{{ ts.get('lost',0) }}</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="stat-section glass">
+    <div class="stat-section-title"><span class="bar-accent"></span>ATTACK</div>
+    <div class="attack-row">
+      <div class="attack-nums">
+        <div class="atk-item"><div class="atk-dot light"></div><div>Total shots</div><div class="atk-val">{{ ts.shots }}</div></div>
+        <div class="atk-item"><div class="atk-dot mid"></div><div>Shots on target</div><div class="atk-val">{{ ts.sot }}</div></div>
+        <div class="atk-item"><div class="atk-dot dark"></div><div>Goals scored</div><div class="atk-val">{{ ts.gf }}</div></div>
+      </div>
+      <canvas id="shotChart" width="120" height="120"></canvas>
+    </div>
+  </div>
+
+  <div class="stat-section glass">
+    <div class="stat-section-title"><span class="bar-accent"></span>DISTRIBUTION</div>
+    <div class="dist-nums">
+      <div class="dist-item"><div class="dist-val">{{ ts.passes }}</div><div class="dist-lbl">Total passes</div></div>
+      <div class="dist-item"><div class="dist-val">{{ (ts.passes * ts.pass_acc / 100)|int }}</div><div class="dist-lbl">Successful</div></div>
+      <div class="dist-item"><div class="dist-val">{{ "%.1f"|format(ts.passes / team_matches|length if team_matches else 0) }}</div><div class="dist-lbl">Per match</div></div>
+    </div>
+    <div class="bar-row"><span>Pass accuracy</span><div class="bar-track"><div class="bar-fill blue" style="width:{{ ts.pass_acc }}%"></div></div><span class="bar-val">{{ ts.pass_acc }}%</span></div>
+  </div>
+
+  <div class="stat-section glass">
+    <div class="stat-section-title"><span class="bar-accent"></span>DISCIPLINE</div>
+    <div class="disc-grid">
+      <div class="disc-item"><div class="disc-val">{{ ts.fouls_won }}</div><div class="disc-lbl">Fouls won</div></div>
+      <div class="disc-item"><div class="disc-val">{{ ts.fouls_conc }}</div><div class="disc-lbl">Fouls conceded</div></div>
+      <div class="disc-item"><div class="disc-val">{{ ts.yc }}<span class="card-icon yellow-card"></span></div><div class="disc-lbl">Yellow cards</div></div>
+      <div class="disc-item"><div class="disc-val">{{ ts.rc }}<span class="card-icon red-card"></span></div><div class="disc-lbl">Red cards</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- Players -->
+{% if players %}
+<h2 class="section-title"><i class="fa fa-user-group"></i> Players at this tournament</h2>
+<div class="players-grid">
+  {% for p in players %}
+  <div class="player-card tilt-card" data-tilt data-tilt-max="10">
+    <div class="pc-top-row">
+      <span class="p-rank-num"></span>
+      <span class="p-pos-badge {{ p.pos|lower }}">{{ p.pos }}</span>
+    </div>
+    <div class="pc-country-block">
+      {% if p.flag_url %}
+      <img src="{{ p.flag_url }}" alt="{{ p.team }}" class="pc-flag-img" loading="lazy">
+      {% endif %}
+    </div>
+    <div class="pc-name">{{ p.name }}</div>
+    <div class="pc-team">{{ p.team }}</div>
+    <div class="pc-rating-bar"><div class="pc-rating-fill" style="width:{{ (p.rating/10*100)|int }}%"></div></div>
+    <div class="pc-stats-row">
+      <div class="pc-stat"><div class="pc-stat-val">{{ p.goals }}</div><div class="pc-stat-lbl">GOALS</div></div>
+      <div class="pc-stat-divider"></div>
+      <div class="pc-stat"><div class="pc-stat-val">{{ p.assists }}</div><div class="pc-stat-lbl">ASSISTS</div></div>
+      <div class="pc-stat-divider"></div>
+      <div class="pc-stat"><div class="pc-stat-val">{{ p.rating }}</div><div class="pc-stat-lbl">RATING</div></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const ctx = document.getElementById('shotChart').getContext('2d');
+new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    datasets: [{
+      data: [{{ ts.sot }}, {{ ts.shots - ts.sot }}],
+      backgroundColor: ['#10b981','rgba(16,185,129,0.2)'],
+      borderWidth: 0
+    }]
+  },
+  options: { cutout:'70%', plugins:{legend:{display:false}}, animation:{animateRotate:true} }
+});
+</script>
+{% endblock %}

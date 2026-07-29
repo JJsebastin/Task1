@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard – PlayStats FIFA 2026{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-chart-bar"></i> Analytics Dashboard</h1>
+  <p>FIFA World Cup 2026 · Interactive visualizations</p>
+</div>
+
+<div class="viz-grid">
+  <!-- Goals per group -->
+  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">⚽ Goals Per Group</h3>
+    <canvas id="goalsChart" height="220"></canvas>
+  </div>
+
+  <!-- Top teams by wins -->
+  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">🏆 Top Teams by Wins</h3>
+    <canvas id="winsChart" height="220"></canvas>
+  </div>
+
+  <!-- Top scorers bar -->
+  <div class="viz-card glass wide tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">🥅 Golden Boot – Top Scorers</h3>
+    <canvas id="scorersChart" height="200"></canvas>
+  </div>
+
+  <!-- Radar: Team comparison -->
+  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">📡 Team Radar – Argentina vs France</h3>
+    <canvas id="radarChart" height="280"></canvas>
+  </div>
+
+  <!-- Possession pie -->
+  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">🔄 Possession Comparison</h3>
+    <canvas id="possChart" height="280"></canvas>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}

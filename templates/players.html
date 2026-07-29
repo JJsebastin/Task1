@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% block title %}Players – PlayStats FIFA 2026{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1><i class="fa fa-user-group"></i> Player Statistics</h1>
+  <p>FIFA World Cup 2026 · Top performers · Final standings</p>
+</div>
+
+<!-- Filter bar -->
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterPos('all',this)">All</button>
+  <button class="filter-btn" onclick="filterPos('FW',this)">⚡ Forwards</button>
+  <button class="filter-btn" onclick="filterPos('MF',this)">🎯 Midfielders</button>
+  <button class="filter-btn" onclick="filterPos('DF',this)">🛡️ Defenders</button>
+</div>
+
+<div class="players-grid" id="playersGrid">
+{% for p in players %}
+<div class="player-card tilt-card" data-tilt data-tilt-max="12" data-pos="{{ p.pos }}">
+
+  <!-- Rank + Position Badge row -->
+  <div class="pc-top-row">
+    <span class="p-rank-num">{{ loop.index }}</span>
+    <span class="p-pos-badge {{ p.pos|lower }}">{{ p.pos }}</span>
+  </div>
+
+  <!-- Flag image only -->
+  <div class="pc-country-block">
+    {% if p.flag_url %}
+    <img src="{{ p.flag_url }}" alt="{{ p.team }} flag" class="pc-flag-img" loading="lazy">
+    {% endif %}
+  </div>
+
+  <!-- Name & Team -->
+  <div class="pc-name">{{ p.name }}</div>
+  <div class="pc-team">{{ p.team }}</div>
+
+  <!-- Rating bar -->
+  <div class="pc-rating-bar">
+    <div class="pc-rating-fill" style="width:{{ (p.rating/10*100)|int }}%"></div>
+  </div>
+
+  <!-- Stats row -->
+  <div class="pc-stats-row">
+    <div class="pc-stat">
+      <div class="pc-stat-val">{{ p.goals }}</div>
+      <div class="pc-stat-lbl"><i class="fa fa-futbol"></i> GOALS</div>
+    </div>
+    <div class="pc-stat-divider"></div>
+    <div class="pc-stat">
+      <div class="pc-stat-val">{{ p.assists }}</div>
+      <div class="pc-stat-lbl"><i class="fa fa-hands-helping"></i> ASSISTS</div>
+    </div>
+    <div class="pc-stat-divider"></div>
+    <div class="pc-stat">
+      <div class="pc-stat-val">{{ p.shots }}</div>
+      <div class="pc-stat-lbl"><i class="fa fa-bullseye"></i> SHOTS</div>
+    </div>
+  </div>
+
+  <!-- Minutes played pill -->
+  <div class="pc-minutes">
+    <i class="fa fa-clock"></i> {{ p.minutes }} mins played
+  </div>
+
+</div>
+{% endfor %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterPos(pos, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.player-card').forEach(c => {
+    c.style.display = (pos === 'all' || c.dataset.pos === pos) ? 'flex' : 'none';
+  });
+}
+</script>
+{% endblock %}

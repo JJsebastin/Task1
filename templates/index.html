@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+{% block title %}Home – PlayStats FIFA 2026{% endblock %}
+
+{% block content %}
+<!-- Tournament Winner Banner -->
+<div class="winner-banner">
+  <div class="winner-inner">
+    <span class="winner-trophy">🏆</span>
+    <div class="winner-text">
+      <span class="winner-label">FIFA World Cup 2026 Champion</span>
+      <span class="winner-country">🇪🇸 Spain</span>
+    </div>
+    <div class="winner-divider"></div>
+    <div class="winner-stat">
+      <span class="ws-val">1–0</span>
+      <span class="ws-lbl">Final vs Argentina (AET)</span>
+    </div>
+    <div class="winner-divider"></div>
+    <div class="winner-stat">
+      <span class="ws-val">🥅 Mbappé</span>
+      <span class="ws-lbl">Golden Boot · 10 Goals</span>
+    </div>
+    <div class="winner-divider"></div>
+    <div class="winner-stat">
+      <span class="ws-val">104</span>
+      <span class="ws-lbl">Total Matches</span>
+    </div>
+  </div>
+</div>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-text">
+    <p class="hero-tag">🏆 FIFA World Cup 2026 · USA · Canada · Mexico</p>
+    <h1>Live Scores &<br><span class="gradient-text">Player Stats</span></h1>
+    <p class="hero-sub">Complete match data, group standings, player analytics & interactive dashboards for the 2026 World Cup — won by Spain.</p>
+    <div class="hero-btns">
+      <a href="/matches" class="btn-primary">View All Matches</a>
+      <a href="/visualization" class="btn-ghost">Dashboard</a>
+    </div>
+  </div>
+  <div class="hero-card tilt-card" data-tilt data-tilt-max="10">
+    <div class="hero-stat-grid">
+      <div class="hs"><div class="hs-val">48</div><div class="hs-lbl">Teams</div></div>
+      <div class="hs"><div class="hs-val">104</div><div class="hs-lbl">Matches</div></div>
+      <div class="hs"><div class="hs-val">{{ scorers|sum(attribute='goals') }}</div><div class="hs-lbl">Goals Scored</div></div>
+      <div class="hs"><div class="hs-val">10</div><div class="hs-lbl">Mbappé Goals</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- Final Highlight -->
+<section class="section">
+  <h2 class="section-title"><i class="fa fa-trophy"></i> The Final – July 19, 2026</h2>
+  <div class="final-card tilt-card" data-tilt data-tilt-max="5">
+    <div class="final-badge">MetLife Stadium · New Jersey · Att: 80,663</div>
+    <div class="final-teams">
+      <div class="final-team">
+        <span class="final-flag">🇪🇸</span>
+        <span class="final-tname">Spain</span>
+        <span class="final-tag champion">Champion 🏆</span>
+      </div>
+      <div class="final-score-box">
+        <span class="final-score">1 — 0</span>
+        <span class="final-aet">After Extra Time</span>
+        <span class="final-scorer">⚽ Ferran Torres 106'</span>
+      </div>
+      <div class="final-team">
+        <span class="final-flag">🇦🇷</span>
+        <span class="final-tname">Argentina</span>
+        <span class="final-tag runner">Runner-up</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recent Knockout Matches -->
+<section class="section">
+  <h2 class="section-title"><i class="fa fa-clock"></i> Recent Results</h2>
+  <div class="match-grid">
+    {% for m in recent|reverse %}
+    <div class="match-card tilt-card" data-tilt data-tilt-max="8">
+      <div class="match-top-row">
+        <span class="match-stage-badge">{{ m.stage }}</span>
+        <span class="match-date">{{ m.date }}</span>
+        <span class="status-badge ft">FT</span>
+      </div>
+      <div class="match-teams">
+        <div class="team-side">
+          <span class="flag lg">{{ m.team1.flag }}</span>
+          <span class="tname">{{ m.team1.name }}</span>
+        </div>
+        <div class="score-box">
+          <span class="score">{{ m.score1 }} – {{ m.score2 }}</span>
+        </div>
+        <div class="team-side right">
+          <span class="flag lg">{{ m.team2.flag }}</span>
+          <span class="tname">{{ m.team2.name }}</span>
+        </div>
+      </div>
+      <div class="match-meta"><i class="fa fa-location-dot"></i> {{ m.venue }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+
+<!-- Golden Boot Race -->
+<section class="section">
+  <h2 class="section-title"><i class="fa fa-trophy"></i> Golden Boot Race</h2>
+  <div class="scorers-grid">
+    {% for p in scorers %}
+    <a href="/players" class="scorer-card tilt-card" data-tilt data-tilt-max="12">
+      <div class="scorer-rank {% if loop.index==1 %}gold{% elif loop.index==2 %}silver{% elif loop.index==3 %}bronze{% endif %}">{{ loop.index }}</div>
+      <div class="scorer-info">
+        {% if p.flag_url %}
+        <img src="{{ p.flag_url }}" alt="{{ p.team }}" class="scorer-flag-img">
+        {% else %}
+        <span class="scorer-flag">{{ p.flag }}</span>
+        {% endif %}
+        <div>
+          <div class="scorer-name">{{ p.name }}</div>
+          <div class="scorer-team">{{ p.team }} · {{ p.pos }}</div>
+        </div>
+      </div>
+      <div class="scorer-goals">
+        <span class="goal-num">{{ p.goals }}</span>
+        <span class="goal-lbl">goals</span>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Winner Banner */
+.winner-banner{background:linear-gradient(135deg,var(--green-dark),var(--green));border-radius:20px;padding:1.25rem 2rem;margin-bottom:2.5rem;box-shadow:0 8px 30px rgba(16,185,129,.3)}
+.winner-inner{display:flex;align-items:center;gap:2rem;flex-wrap:wrap;justify-content:center}
+.winner-trophy{font-size:2.5rem;line-height:1}
+.winner-text{display:flex;flex-direction:column}
+.winner-label{color:rgba(255,255,255,.85);font-size:.8rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.winner-country{color:#fff;font-size:1.5rem;font-weight:800}
+.winner-divider{width:1px;height:40px;background:rgba(255,255,255,.3);flex-shrink:0}
+.winner-stat{display:flex;flex-direction:column;text-align:center}
+.ws-val{color:#fff;font-size:1.2rem;font-weight:800}
+.ws-lbl{color:rgba(255,255,255,.8);font-size:.75rem;font-weight:600}
+
+/* Final card */
+.final-card{background:#fff;border-radius:24px;border:1px solid var(--card-border);padding:2rem;box-shadow:0 8px 30px rgba(16,185,129,.1)}
+.final-badge{text-align:center;color:var(--muted);font-size:.85rem;font-weight:600;margin-bottom:1.5rem;background:var(--bg);padding:.6rem 1.5rem;border-radius:99px;display:inline-block;left:50%;position:relative;transform:translateX(-50%)}
+.final-teams{display:flex;align-items:center;justify-content:space-between;gap:2rem}
+.final-team{display:flex;flex-direction:column;align-items:center;gap:.75rem;flex:1}
+.final-flag{font-size:4rem;line-height:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.15))}
+.final-tname{font-size:1.5rem;font-weight:800;color:var(--text-main)}
+.final-tag{font-size:.8rem;font-weight:700;padding:.4rem 1rem;border-radius:99px}
+.final-tag.champion{background:var(--green-light);color:var(--green-dark)}
+.final-tag.runner{background:var(--bg);color:var(--muted);border:1px solid var(--card-border)}
+.final-score-box{display:flex;flex-direction:column;align-items:center;gap:.5rem;text-align:center}
+.final-score{font-size:4rem;font-weight:900;color:var(--text-main);line-height:1;letter-spacing:-2px}
+.final-aet{font-size:.85rem;color:var(--muted);font-weight:600}
+.final-scorer{font-size:.9rem;color:var(--green-dark);font-weight:700;background:var(--green-light);padding:.4rem 1rem;border-radius:99px}
+@media(max-width:600px){.winner-inner{gap:1rem}.final-teams{flex-direction:column}.final-badge{transform:none;left:0;position:relative}}
+</style>
+{% endblock %}

@@ -1,5 +1,12 @@
-streamlit
+# PlayStats – Sports Score Visualizer
 pandas
-numpy
 matplotlib
+
+# IMDB Parser (separate tool in this workspace)
+cinemagoer
+openpyxl
+
+# Superstore Dashboard (Task1.py)
+streamlit
 plotly
+numpy
