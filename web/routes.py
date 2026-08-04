@@ -17,7 +17,7 @@ def index():
 @main_bp.route("/matches")
 def matches():
     stages = ["Group Stage", "Round of 32", "Round of 16",
-              "Quarterfinal", "Semifinal", "Third Place", "Final"]
+              "Quarter-finals", "Semi-finals", "Third Place", "Final"]
     grouped = {s: fd.get_matches_by_stage(s) for s in stages}
     return render_template("matches.html", grouped=grouped)
 
@@ -48,7 +48,9 @@ def players():
 
 @main_bp.route("/visualization")
 def visualization():
-    return render_template("visualization.html")
+    spain_stats = fd.get_team_stats("Spain")
+    spain_matches = [m for m in fd.get_all_matches() if m["team1"]["name"] == "Spain" or m["team2"]["name"] == "Spain"]
+    return render_template("visualization.html", spain_stats=spain_stats, spain_matches=spain_matches)
 
 
 # ── JSON API ──────────────────────────────────────────────────────────────────
@@ -71,6 +73,19 @@ def api_players():
 @main_bp.route("/api/chart-data")
 def api_chart_data():
     return jsonify(fd.get_chart_data())
+
+
+@main_bp.route("/api/attack-chart")
+def api_attack_chart():
+    return jsonify(fd.get_attack_chart_data())
+
+
+@main_bp.route("/api/match/<int:match_id>")
+def api_match(match_id):
+    match = next((m for m in fd.get_all_matches() if m["id"] == match_id), None)
+    if not match:
+        return jsonify({"error": "not found"}), 404
+    return jsonify(match)
 
 
 @main_bp.route("/api/team/<team_name>")

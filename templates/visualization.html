@@ -6,39 +6,639 @@
   <p>FIFA World Cup 2026 · Interactive visualizations</p>
 </div>
 
+<!-- ══════════════════════════════════════════════════════════
+     SPAIN CHAMPIONS SECTION
+     ══════════════════════════════════════════════════════════ -->
+{% if spain_stats %}
+<div id="spain-champions" class="section" style="margin-bottom: 4rem; padding-top: 2rem; scroll-margin-top: 100px;">
+  <div class="section-title" style="margin-bottom: 2rem; font-size: 2.2rem; display: flex; align-items: center; gap: 1rem;">
+    <img src="https://flagcdn.com/48x36/es.png" alt="Spain" style="width:52px; border-radius:6px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+    <span>Spain Champions Analytics</span>
+  </div>
+  
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+    <!-- ANIMATED Grid Chart of Stats -->
+    <div class="viz-card animated-grid-container" style="grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2rem; padding: 1.5rem;">
+        <h3 class="viz-title" style="grid-column: 1 / -1; margin-bottom: 0.5rem;"><i class="fa fa-th"></i> Animated Tournament Metrics Grid</h3>
+        
+        <div class="hs animated-grid-item" style="padding: 1.5rem 2rem; border-radius:16px; --delay: 0.1s; display: flex; align-items: center; justify-content: space-between;">
+          <div class="hs-lbl" style="font-size: 1.05rem; font-weight: 700; color: var(--muted); margin: 0; text-align: left;">Avg Possession</div>
+          <div class="hs-val counter" data-target="{{ spain_stats.poss }}" data-suffix="%" style="font-size: 2.8rem; font-weight: 800; color:var(--green); margin: 0;">0%</div>
+        </div>
+        
+        <div class="hs animated-grid-item" style="padding: 1.5rem 2rem; border-radius:16px; --delay: 0.2s; display: flex; align-items: center; justify-content: space-between;">
+          <div class="hs-lbl" style="font-size: 1.05rem; font-weight: 700; color: var(--muted); margin: 0; text-align: left;">Total Shots</div>
+          <div class="hs-val counter" data-target="{{ spain_stats.shots }}" data-suffix="" style="font-size: 2.8rem; font-weight: 800; color:var(--text-main); margin: 0;">0</div>
+        </div>
+        
+        <div class="hs animated-grid-item" style="padding: 1.5rem 2rem; border-radius:16px; --delay: 0.3s; display: flex; align-items: center; justify-content: space-between;">
+          <div class="hs-lbl" style="font-size: 1.05rem; font-weight: 700; color: var(--muted); margin: 0; text-align: left;">Shots on Target</div>
+          <div class="hs-val counter" data-target="{{ spain_stats.sot }}" data-suffix="" style="font-size: 2.8rem; font-weight: 800; color:var(--text-main); margin: 0;">0</div>
+        </div>
+        
+        <div class="hs animated-grid-item" style="padding: 1.5rem 2rem; border-radius:16px; --delay: 0.4s; display: flex; align-items: center; justify-content: space-between;">
+          <div class="hs-lbl" style="font-size: 1.05rem; font-weight: 700; color: var(--muted); margin: 0; text-align: left;">Saves Made</div>
+          <div class="hs-val counter" data-target="{{ spain_stats.saves }}" data-suffix="" style="font-size: 2.8rem; font-weight: 800; color:var(--green); margin: 0;">0</div>
+        </div>
+        
+        <div class="hs animated-grid-item" style="padding: 1.5rem 2rem; border-radius:16px; --delay: 0.5s; display: flex; align-items: center; justify-content: space-between;">
+          <div class="hs-lbl" style="font-size: 1.05rem; font-weight: 700; color: var(--muted); margin: 0; text-align: left;">Total Corners</div>
+          <div class="hs-val counter" data-target="{{ spain_stats.corners }}" data-suffix="" style="font-size: 2.8rem; font-weight: 800; color:var(--text-main); margin: 0;">0</div>
+        </div>
+        
+        <div class="hs animated-grid-item" style="padding: 1.5rem 2rem; border-radius:16px; --delay: 0.6s; display: flex; align-items: center; justify-content: space-between;">
+          <div class="hs-lbl" style="font-size: 1.05rem; font-weight: 700; color: var(--muted); margin: 0; text-align: left;">Goals Scored</div>
+          <div class="hs-val counter" data-target="{{ spain_stats.gf }}" data-suffix="" style="font-size: 2.8rem; font-weight: 800; color:var(--blue); margin: 0;">0</div>
+        </div>
+    </div>
+    
+    <!-- Grid Chart: Home vs Away Performance Grid -->
+    <div class="viz-card wide" style="grid-column: 1 / -1; padding: 1.5rem;">
+      <h3 class="viz-title">🥅 Home vs Away Performance (Grid Chart)</h3>
+      <div style="position: relative; height: 320px; width: 100%;">
+        <canvas id="spainGridChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Animated Line Chart (e.g. Goals/Shots per Match) -->
+    <div class="viz-card">
+      <h3 class="viz-title">📈 Attacking Trend (Per Match)</h3>
+      <div style="position: relative; height: 260px; width: 100%;">
+        <canvas id="spainLineChart"></canvas>
+      </div>
+    </div>
+    
+    <!-- Pie Chart (e.g. Match Outcomes or Goals distribution) -->
+    <div class="viz-card">
+      <h3 class="viz-title">📊 Tournament Record</h3>
+      <div style="position: relative; height: 260px; width: 100%;">
+        <canvas id="spainPieChart"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- Separator Line -->
+<div style="display: flex; align-items: center; text-align: center; margin: 3rem 0; color: var(--muted-light); font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.15em;">
+  <div style="flex: 1; height: 1px; background: var(--card-border);"></div>
+  <span style="padding: 0 2rem; color: var(--muted);"><i class="fa fa-globe" style="margin-right: 0.5rem; color: var(--green);"></i> Global Tournament Analytics</span>
+  <div style="flex: 1; height: 1px; background: var(--card-border);"></div>
+</div>
+
 <div class="viz-grid">
+
   <!-- Goals per group -->
-  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
+  <div class="viz-card tilt-card" data-tilt data-tilt-max="5">
     <h3 class="viz-title">⚽ Goals Per Group</h3>
     <canvas id="goalsChart" height="220"></canvas>
   </div>
 
   <!-- Top teams by wins -->
-  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
+  <div class="viz-card tilt-card" data-tilt data-tilt-max="5">
     <h3 class="viz-title">🏆 Top Teams by Wins</h3>
     <canvas id="winsChart" height="220"></canvas>
   </div>
 
-  <!-- Top scorers bar -->
-  <div class="viz-card glass wide tilt-card" data-tilt data-tilt-max="5">
-    <h3 class="viz-title">🥅 Golden Boot – Top Scorers</h3>
-    <canvas id="scorersChart" height="200"></canvas>
+
+  <!-- ══════════════════════════════════════════════════════════
+       ANIMATED ATTACK BAR CHART  (Jitter-style racing bars)
+       ══════════════════════════════════════════════════════════ -->
+  <div class="viz-card wide attack-chart-card" id="attackChartCard">
+
+    <!-- Header row -->
+    <div class="attack-header">
+      <div>
+        <h3 class="viz-title" style="margin-bottom:.25rem">
+          <i class="fa fa-bolt" style="color:var(--green)"></i> Team Attacking Metrics
+        </h3>
+        <p style="color:var(--muted);font-size:.85rem;font-weight:500">Animated comparison · Goals · Shots · Shots on Target · Corners</p>
+      </div>
+      <div class="attack-controls">
+        <button class="metric-btn active" data-metric="goals">Goals</button>
+        <button class="metric-btn" data-metric="shots">Total Shots</button>
+        <button class="metric-btn" data-metric="sot">Shots on Target</button>
+        <button class="metric-btn" data-metric="corners">Corners</button>
+        <button class="replay-btn" id="replayBtn" title="Replay animation">
+          <i class="fa fa-rotate-right"></i> Replay
+        </button>
+      </div>
+    </div>
+
+    <!-- Chart area -->
+    <div class="attack-chart-wrap" id="attackChartWrap">
+      <canvas id="attackChart"></canvas>
+    </div>
   </div>
 
   <!-- Radar: Team comparison -->
-  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
-    <h3 class="viz-title">📡 Team Radar – Argentina vs France</h3>
+  <div class="viz-card tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">📡 Team Radar – Spain vs Argentina</h3>
     <canvas id="radarChart" height="280"></canvas>
   </div>
 
   <!-- Possession pie -->
-  <div class="viz-card glass tilt-card" data-tilt data-tilt-max="5">
-    <h3 class="viz-title">🔄 Possession Comparison</h3>
+  <div class="viz-card tilt-card" data-tilt data-tilt-max="5">
+    <h3 class="viz-title">🔄 Possession – Final</h3>
     <canvas id="possChart" height="280"></canvas>
   </div>
+
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Animated Bar Chart Card ─────────────────────────────── */
+.attack-chart-card {
+  background: #fff;
+  border-radius: 24px;
+  padding: 2rem;
+  border: 1px solid var(--card-border);
+}
+.attack-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+.attack-controls {
+  display: flex;
+  gap: .6rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.metric-btn {
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  color: var(--muted);
+  padding: .45rem 1.1rem;
+  border-radius: 99px;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .25s ease;
+  font-family: 'Poppins', sans-serif;
+}
+.metric-btn.active,
+.metric-btn:hover {
+  background: var(--green);
+  color: #fff;
+  border-color: var(--green);
+  box-shadow: 0 4px 14px rgba(16,185,129,.25);
+}
+.replay-btn {
+  background: var(--text-main);
+  color: #fff;
+  border: none;
+  padding: .45rem 1.1rem;
+  border-radius: 99px;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .25s ease;
+  font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: .4rem;
+}
+.replay-btn:hover {
+  background: var(--green-dark);
+  box-shadow: 0 4px 14px rgba(16,185,129,.3);
+}
+.replay-btn i { transition: transform .5s ease; }
+.replay-btn.spinning i { transform: rotate(360deg); }
+
+.attack-chart-wrap {
+  position: relative;
+  height: 420px;
+}
+#attackChart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* ── Animated Grid Chart ─────────────────────────────── */
+.animated-grid-item {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+  background: var(--bg);
+  border: 1px solid var(--card-border);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.animated-grid-item.animate-in {
+  animation: gridPopIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation-delay: var(--delay);
+}
+.animated-grid-item:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 10px 25px rgba(16,185,129,0.15);
+  background: #fff;
+  z-index: 10;
+}
+@keyframes gridPopIn {
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+</style>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+/* ═══════════════════════════════════════════════════════════
+   ANIMATED ATTACK BAR CHART
+   ═══════════════════════════════════════════════════════════ */
+(function () {
+  let attackData = [];
+  let attackChart = null;
+  let currentMetric = 'goals';
+
+  const METRIC_LABELS = {
+    goals:   'Goals',
+    shots:   'Total Shots',
+    sot:     'Shots on Target',
+    corners: 'Corners',
+  };
+
+  const PALETTE = [
+    '#10b981','#059669','#34d399','#6ee7b7',
+    '#3b82f6','#8b5cf6','#f59e0b','#ef4444',
+    '#06b6d4','#ec4899',
+  ];
+
+  /* ── Custom plugin: flag images on y-axis ── */
+  const flagCache = {};
+
+  const flagPlugin = {
+    id: 'flagLabels',
+    afterDraw(chart) {
+      // Don't draw if chart is destroyed
+      if (!chart || chart.destroyed) return;
+      
+      const { ctx, scales: { y } } = chart;
+      let needsUpdate = false;
+      
+      y.ticks.forEach((tick, i) => {
+        const d = attackData[i];
+        if (!d) return;
+        const yPos = y.getPixelForTick(i);
+        
+        if (flagCache[d.flag_url]) {
+          // If image is loaded, draw it directly
+          if (flagCache[d.flag_url].complete) {
+              ctx.drawImage(flagCache[d.flag_url], 4, yPos - 13, 34, 26);
+          }
+        } else {
+          // Load image and request update when done
+          const img = new Image();
+          img.src = d.flag_url;
+          flagCache[d.flag_url] = img;
+          img.onload = () => {
+             if (!chart.destroyed) chart.update();
+          };
+        }
+      });
+    },
+  };
+
+  function buildChart(data, metric) {
+    if (attackChart) {
+      attackChart.destroy();
+      attackChart = null;
+    }
+    
+    // Hard reset the DOM element to completely avoid any Chart.js ghosting issues
+    const wrap = document.getElementById('attackChartWrap');
+    if (wrap) {
+        wrap.innerHTML = '<canvas id="attackChart"></canvas>';
+    }
+
+    const canvas = document.getElementById('attackChart');
+    const ctx = canvas.getContext('2d');
+    
+    // Sort and update global data
+    const sorted = [...data].sort((a, b) => b[metric] - a[metric]);
+    attackData = sorted;
+
+    const labels  = sorted.map(d => d.team);
+    const values  = sorted.map(d => d[metric]);
+    const maxVal  = Math.max(...values) * 1.15;
+
+    attackChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: METRIC_LABELS[metric],
+          data: values,
+          backgroundColor: sorted.map((_, i) => PALETTE[i % PALETTE.length]),
+          borderRadius: 10,
+          borderSkipped: false,
+        }],
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: {
+          delay(ctx) {
+            return ctx.dataIndex * 120;
+          },
+          duration: 900,
+          easing: 'easeOutQuart',
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ` ${ctx.parsed.x} ${METRIC_LABELS[metric]}`,
+            },
+            backgroundColor: '#1f2937',
+            titleColor: '#f9fafb',
+            bodyColor: '#d1fae5',
+            padding: 12,
+            cornerRadius: 10,
+          },
+        },
+        scales: {
+          x: {
+            max: maxVal,
+            grid: { color: '#f3f4f6' },
+            ticks: {
+              color: '#9ca3af',
+              font: { family: 'Poppins', size: 12 },
+              stepSize: 1,
+            },
+            border: { display: false },
+          },
+          y: {
+            grid: { display: false },
+            border: { display: false },
+            ticks: {
+              color: '#374151',
+              font: { family: 'Poppins', size: 13, weight: '700' },
+              padding: 48,   /* space for flag image */
+            },
+          },
+        },
+        layout: {
+          padding: { left: 10, right: 30 },
+        },
+      },
+      /* value labels at end of bars */
+      plugins: [flagPlugin, {
+        id: 'barValueLabels',
+        afterDatasetsDraw(chart) {
+          const { ctx, data, scales: { x } } = chart;
+          ctx.save();
+          data.datasets.forEach((ds, di) => {
+            chart.getDatasetMeta(di).data.forEach((bar, i) => {
+              const v = ds.data[i];
+              const xPos = x.getPixelForValue(v) + 8;
+              const yPos = bar.y;
+              ctx.fillStyle = '#374151';
+              ctx.font = '700 13px Poppins, sans-serif';
+              ctx.textBaseline = 'middle';
+              ctx.fillText(v, xPos, yPos);
+            });
+          });
+          ctx.restore();
+        },
+      }],
+    });
+  }
+
+  /* ── Fetch data & init ── */
+  fetch('/api/attack-chart')
+    .then(r => r.json())
+    .then(data => {
+      buildChart(data, 'goals');
+
+      /* Metric buttons */
+      document.querySelectorAll('.metric-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.metric-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentMetric = btn.dataset.metric;
+          buildChart(data, currentMetric);
+        });
+      });
+
+      /* Replay button */
+      document.getElementById('replayBtn').addEventListener('click', function () {
+        this.classList.add('spinning');
+        setTimeout(() => this.classList.remove('spinning'), 600);
+        buildChart(data, currentMetric);
+      });
+    })
+    .catch(e => console.warn('Attack chart data error:', e));
+})();
+</script>
+
+{% if spain_stats and spain_matches %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    
+    /* ── Animated Grid Chart Counters (Triggered on Scroll) ── */
+    const counters = document.querySelectorAll('.counter');
+    const gridItems = document.querySelectorAll('.animated-grid-item');
+    let hasAnimated = false;
+
+    const observer = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && !hasAnimated) {
+            hasAnimated = true;
+            
+            // Add CSS animation class
+            gridItems.forEach(item => item.classList.add('animate-in'));
+
+            // Start JS number counter
+            counters.forEach(counter => {
+                const target = +counter.getAttribute('data-target');
+                const suffix = counter.getAttribute('data-suffix') || '';
+                const duration = 1500; // 1.5s
+                const step = (target / duration) * 16; // 60fps roughly
+                
+                let current = 0;
+                const updateCounter = () => {
+                    current += step;
+                    if (current < target) {
+                        counter.innerText = Math.ceil(current) + suffix;
+                        requestAnimationFrame(updateCounter);
+                    } else {
+                        counter.innerText = target + suffix;
+                    }
+                };
+                
+                // Delay start slightly to sync with CSS pop-in
+                setTimeout(updateCounter, 200);
+            });
+        }
+    }, { threshold: 0.3 });
+
+    const gridContainer = document.querySelector('.animated-grid-container');
+    if (gridContainer) observer.observe(gridContainer);
+
+    const spainMatches = {{ spain_matches|tojson|safe }};
+    const spainPieCtx = document.getElementById('spainPieChart');
+    const spainLineCtx = document.getElementById('spainLineChart');
+    
+    // Process data for Grid Chart (Home vs Away)
+    let homeMatches = 0, awayMatches = 0;
+    let homePoss = 0, awayPoss = 0, homeSot = 0, awaySot = 0;
+    let homeSaves = 0, awaySaves = 0, homeCorners = 0, awayCorners = 0;
+    let homePasses = 0, awayPasses = 0;
+
+    spainMatches.forEach(m => {
+        if (m.team1.name === 'Spain') {
+            homeMatches++;
+            homePoss += m.stats.home_possession;
+            homeSot += m.stats.home_sot;
+            homeSaves += m.stats.home_saves;
+            homeCorners += m.stats.home_corners;
+            homePasses += m.stats.home_interceptions; // Proxy for passes
+        } else {
+            awayMatches++;
+            awayPoss += m.stats.away_possession;
+            awaySot += m.stats.away_sot;
+            awaySaves += m.stats.away_saves;
+            awayCorners += m.stats.away_corners;
+            awayPasses += m.stats.away_interceptions; // Proxy for passes
+        }
+    });
+
+    if (homeMatches > 0) { homePoss /= homeMatches; homeSot /= homeMatches; homeSaves /= homeMatches; homeCorners /= homeMatches; homePasses /= homeMatches; }
+    if (awayMatches > 0) { awayPoss /= awayMatches; awaySot /= awayMatches; awaySaves /= awayMatches; awayCorners /= awayMatches; awayPasses /= awayMatches; }
+
+    const spainGridCtx = document.getElementById('spainGridChart');
+    if (spainGridCtx) {
+        new Chart(spainGridCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Possession (%)', 'Shots on Target', 'Saves', 'Corners', 'Passes (Interceptions)'],
+                datasets: [
+                    {
+                        label: 'Home Team',
+                        data: [homePoss.toFixed(1), homeSot.toFixed(1), homeSaves.toFixed(1), homeCorners.toFixed(1), homePasses.toFixed(1)],
+                        backgroundColor: '#10b981',
+                        borderRadius: 4
+                    },
+                    {
+                        label: 'Away Team',
+                        data: [awayPoss.toFixed(1), awaySot.toFixed(1), awaySaves.toFixed(1), awayCorners.toFixed(1), awayPasses.toFixed(1)],
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                indexAxis: 'y', // Makes it horizontal like a grid chart
+                scales: {
+                    x: {
+                        grid: { color: '#e5e7eb', lineWidth: 1, borderDash: [5, 5] },
+                        ticks: { font: { family: 'Poppins' } }
+                    },
+                    y: {
+                        grid: { display: false },
+                        ticks: { font: { family: 'Poppins', weight: '600' } }
+                    }
+                },
+                plugins: {
+                    legend: { position: 'top', labels: { font: { family: 'Poppins' } } }
+                },
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    }
+
+    // Process data for Line Chart
+    const labels = spainMatches.map(m => m.team1.name === 'Spain' ? 'vs ' + m.team2.name : 'vs ' + m.team1.name);
+    const goalsData = spainMatches.map(m => m.team1.name === 'Spain' ? m.score1 : m.score2);
+    const shotsData = spainMatches.map(m => m.team1.name === 'Spain' ? m.stats.home_total_shots : m.stats.away_total_shots);
+
+    new Chart(spainLineCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Goals',
+                    data: goalsData,
+                    borderColor: '#10b981',
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    borderWidth: 3,
+                    pointBackgroundColor: '#10b981'
+                },
+                {
+                    label: 'Total Shots',
+                    data: shotsData,
+                    borderColor: '#3b82f6',
+                    backgroundColor: 'transparent',
+                    tension: 0.4,
+                    borderWidth: 2,
+                    borderDash: [5, 5],
+                    pointBackgroundColor: '#3b82f6'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { position: 'top', labels: { font: { family: 'Poppins' } } },
+            },
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#f3f4f6' }, ticks: { font: { family: 'Poppins' } } },
+                x: { grid: { display: false }, ticks: { font: { family: 'Poppins' } } }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeOutQuart'
+            }
+        }
+    });
+
+    // Process data for Pie Chart
+    const wins = {{ spain_stats.won }};
+    const draws = {{ spain_stats.drawn }};
+    const losses = {{ spain_stats.lost }};
+
+    new Chart(spainPieCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Wins', 'Draws', 'Losses'],
+            datasets: [{
+                data: [wins, draws, losses],
+                backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            cutout: '70%',
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { family: 'Poppins', padding: 20 } } }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1500
+            }
+        }
+    });
+});
+</script>
+{% endif %}
 {% endblock %}

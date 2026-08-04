@@ -3,80 +3,428 @@
 {% block content %}
 <div class="page-header">
   <h1><i class="fa fa-futbol"></i> All Matches</h1>
-  <p>FIFA World Cup 2026 · 104 matches · June 11 – July 19, 2026</p>
+  <p>FIFA World Cup 2026 · Click any match to view full stats</p>
 </div>
 
 <!-- Stage tabs -->
 <div class="tabs">
-  {% for stage in grouped %}
-  {% if grouped[stage] %}
-  <button class="tab-btn {% if stage=='Final' %}tab-final{% endif %} {% if loop.first %}active{% endif %}" onclick="showTab('{{ stage|replace(' ','_') }}',this)">
+  {% for stage in grouped %}{% if grouped[stage] %}
+  <button class="tab-btn {% if stage=='Final' %}tab-final{% endif %} {% if loop.first %}active{% endif %}"
+          onclick="showTab('{{ stage|replace(' ','_') }}',this)">
     {% if stage=='Final' %}🏆 {% endif %}{{ stage }}
     <span class="tab-count">{{ grouped[stage]|length }}</span>
   </button>
-  {% endif %}
-  {% endfor %}
+  {% endif %}{% endfor %}
 </div>
 
-{% for stage, mlist in grouped.items() %}
-{% if mlist %}
+{% for stage, mlist in grouped.items() %}{% if mlist %}
 <div id="tab_{{ stage|replace(' ','_') }}" class="tab-panel {% if loop.first %}active{% endif %}">
-  <div class="match-grid {% if stage not in ['Group Stage'] %}big{% endif %}">
+  <div class="match-grid {% if stage != 'Group Stage' %}big{% endif %}">
     {% for m in mlist %}
-    <div class="match-card tilt-card {% if stage=='Final' %}final-match-card{% endif %}" data-tilt data-tilt-max="6">
+    <div class="match-card {% if stage=='Final' %}final-match-card{% endif %}"
+         onclick="openMatchModal({{ m.id }})"
+         style="cursor:pointer">
+
       <div class="match-top-row">
         {% if m.group != '-' %}<span class="group-tag">Group {{ m.group }}</span>{% endif %}
         <span class="match-date">{{ m.date }}</span>
         <span class="status-badge {{ 'ft' if m.status=='FT' else 'tbd' }}">{{ m.status }}</span>
+        {% if m.status=='FT' %}<span class="stats-hint"><i class="fa fa-chart-bar"></i> Stats</span>{% endif %}
       </div>
+
       <div class="match-teams">
         <div class="team-side">
-          <span class="flag lg">{{ m.team1.flag }}</span>
+          <img src="{{ m.team1.flag_url }}" alt="{{ m.team1.name }}" class="match-flag" loading="lazy" onerror="this.style.display='none'">
           <span class="tname">{{ m.team1.name }}</span>
         </div>
         <div class="score-box">
           {% if m.status=='FT' %}
-          <span class="score {% if stage=='Final' %}score-final{% endif %}">{{ m.score1 }} – {{ m.score2 }}</span>
-          {% if stage=='Final' %}<span class="aet-label">AET</span>{% endif %}
+            <span class="score {% if stage=='Final' %}score-final{% endif %}">{{ m.score1 }} – {{ m.score2 }}</span>
+            {% if stage=='Final' %}<span class="aet-label">AET</span>{% endif %}
           {% else %}
-          <span class="score vs">VS</span>
+            <span class="score vs">VS</span>
           {% endif %}
         </div>
         <div class="team-side right">
-          <span class="flag lg">{{ m.team2.flag }}</span>
           <span class="tname">{{ m.team2.name }}</span>
+          <img src="{{ m.team2.flag_url }}" alt="{{ m.team2.name }}" class="match-flag" loading="lazy" onerror="this.style.display='none'">
         </div>
       </div>
+
       <div class="match-meta"><i class="fa fa-location-dot"></i> {{ m.venue }}</div>
-      {% if stage=='Final' %}
-      <div class="match-final-label">🏆 FIFA World Cup 2026 Final</div>
-      {% endif %}
+      {% if stage=='Final' %}<div class="match-final-label">🏆 FIFA World Cup 2026 Final</div>{% endif %}
     </div>
     {% endfor %}
   </div>
 </div>
-{% endif %}
-{% endfor %}
+{% endif %}{% endfor %}
+
+
+<!-- ═══════════════════════ MATCH STATS MODAL ═══════════════════════ -->
+<div id="matchModal" class="modal-backdrop" onclick="closeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+
+    <!-- Modal header -->
+    <button class="modal-close" onclick="closeMatchModal()"><i class="fa fa-xmark"></i></button>
+    <div id="modalHeader" class="modal-match-header">
+      <div class="modal-team left">
+        <img id="mFlag1" class="modal-flag" src="" alt="">
+        <span id="mName1" class="modal-tname"></span>
+      </div>
+      <div class="modal-center">
+        <div id="mScore" class="modal-score"></div>
+        <div id="mStage" class="modal-stage-badge"></div>
+        <div id="mVenue" class="modal-venue"></div>
+      </div>
+      <div class="modal-team right">
+        <span id="mName2" class="modal-tname"></span>
+        <img id="mFlag2" class="modal-flag" src="" alt="">
+      </div>
+    </div>
+
+    <!-- Loading state -->
+    <div id="modalLoading" class="modal-loading">
+      <div class="spin-ring"></div><p>Loading match stats…</p>
+    </div>
+
+    <!-- Stats content -->
+    <div id="modalStats" class="modal-stats-content" style="display:none">
+
+      <!-- ── SECTION 1: Possession bar ── -->
+      <div class="stat-section-title"><i class="fa fa-circle-half-stroke"></i> Possession</div>
+      <div class="poss-bar-wrap">
+        <span id="possPct1" class="poss-pct left">0%</span>
+        <div class="poss-track">
+          <div id="possBar1" class="poss-fill home" style="width:50%"></div>
+          <div id="possBar2" class="poss-fill away" style="width:50%"></div>
+        </div>
+        <span id="possPct2" class="poss-pct right">0%</span>
+      </div>
+
+      <!-- ── SECTION 2: Info cards grid ── -->
+      <div class="modal-cards-grid">
+
+        <!-- ATTACK card -->
+        <div class="stat-info-card">
+          <div class="sic-title"><i class="fa fa-bolt" style="color:#f59e0b"></i> Attacking</div>
+          <div class="sic-rows" id="attackRows"></div>
+          <canvas id="attackModalChart" height="160"></canvas>
+        </div>
+
+        <!-- DEFENCE / DISCIPLINE card -->
+        <div class="stat-info-card">
+          <div class="sic-title"><i class="fa fa-shield-halved" style="color:#3b82f6"></i> Defence &amp; Discipline</div>
+          <div class="sic-rows" id="defenceRows"></div>
+          <canvas id="defenceModalChart" height="160"></canvas>
+        </div>
+
+      </div><!-- /cards-grid -->
+
+      <!-- ── SECTION 3: Extra mini-metrics row ── -->
+      <div class="mini-metrics" id="miniMetrics"></div>
+
+    </div><!-- /modalStats -->
+  </div><!-- /modal-box -->
+</div><!-- /backdrop -->
+
 {% endblock %}
 
 {% block extra_css %}
 <style>
-.tab-count{background:rgba(0,0,0,0.08);border-radius:99px;padding:.1rem .5rem;font-size:.75rem;margin-left:.3rem}
+/* ── Tab UI ─────────────────────────────────────────── */
+.tab-count{background:rgba(0,0,0,.08);border-radius:99px;padding:.1rem .5rem;font-size:.75rem;margin-left:.3rem}
 .tab-final{background:var(--green)!important;color:#fff!important;border-color:var(--green)!important}
 .final-match-card{border:2px solid var(--green)!important;box-shadow:0 8px 30px rgba(16,185,129,.2)!important}
 .score-final{color:var(--green-dark)!important;font-size:2.8rem!important}
-.aet-label{font-size:.8rem;color:var(--green-dark);font-weight:700;background:var(--green-light);padding:.3rem .8rem;border-radius:99px;margin-top:.5rem}
+.aet-label{font-size:.8rem;color:var(--green-dark);font-weight:700;background:var(--green-light);padding:.3rem .8rem;border-radius:99px;margin-top:.5rem;display:block;text-align:center}
 .match-final-label{text-align:center;color:var(--green-dark);font-weight:700;font-size:.85rem;background:var(--green-light);padding:.6rem;border-radius:12px;margin-top:.5rem}
+.stats-hint{margin-left:auto;font-size:.72rem;color:var(--green-dark);font-weight:700;background:var(--green-light);padding:.2rem .6rem;border-radius:99px;display:flex;align-items:center;gap:.3rem}
+.match-card:hover{box-shadow:0 12px 32px rgba(16,185,129,.15)!important}
+
+/* ── Team side in match card ────────────────────────── */
+.team-side{flex-direction:column;align-items:center;gap:.5rem}
+.team-side.right{flex-direction:column;align-items:center;gap:.5rem}
+
+/* ── Modal Backdrop ─────────────────────────────────── */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(17,24,39,.55);backdrop-filter:blur(6px);
+  z-index:9000;display:none;align-items:center;justify-content:center;padding:1rem;
+}
+.modal-backdrop.open{display:flex}
+
+/* ── Modal Box ──────────────────────────────────────── */
+.modal-box{
+  background:#fff;border-radius:28px;
+  width:100%;max-width:860px;max-height:92vh;overflow-y:auto;
+  position:relative;box-shadow:0 32px 80px rgba(0,0,0,.25);
+  animation:modalIn .35s cubic-bezier(.22,1,.36,1) both;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.93) translateY(20px)} to{opacity:1;transform:none}}
+
+.modal-close{
+  position:absolute;top:1.25rem;right:1.25rem;
+  background:var(--bg);border:1px solid var(--card-border);border-radius:50%;
+  width:38px;height:38px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.1rem;color:var(--muted);z-index:10;transition:all .2s;
+}
+.modal-close:hover{background:#ef4444;color:#fff;border-color:#ef4444}
+
+/* ── Modal match header ─────────────────────────────── */
+.modal-match-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:2rem 2rem 1.5rem;gap:1rem;
+  background:linear-gradient(135deg,var(--green-light),#fff);
+  border-radius:28px 28px 0 0;
+}
+.modal-team{display:flex;align-items:center;gap:.75rem;flex:1}
+.modal-team.right{justify-content:flex-end}
+.modal-flag{width:56px;height:42px;object-fit:cover;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.12)}
+.modal-tname{font-size:1.15rem;font-weight:800;color:var(--text-main)}
+.modal-center{display:flex;flex-direction:column;align-items:center;gap:.4rem;flex-shrink:0}
+.modal-score{font-size:3rem;font-weight:900;color:var(--text-main);letter-spacing:-2px;line-height:1}
+.modal-stage-badge{font-size:.75rem;font-weight:700;color:var(--green-dark);background:var(--green-light);padding:.35rem .9rem;border-radius:99px}
+.modal-venue{font-size:.78rem;color:var(--muted);font-weight:500;text-align:center;max-width:200px}
+
+/* ── Loading spinner ────────────────────────────────── */
+.modal-loading{display:flex;flex-direction:column;align-items:center;gap:1rem;padding:3rem;color:var(--muted)}
+.spin-ring{width:40px;height:40px;border:4px solid var(--card-border);border-top-color:var(--green);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── Stats content ──────────────────────────────────── */
+.modal-stats-content{padding:0 2rem 2rem}
+
+/* Possession bar */
+.stat-section-title{font-size:.78rem;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:1.25rem 0 .6rem}
+.poss-bar-wrap{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem}
+.poss-track{flex:1;height:14px;border-radius:99px;overflow:hidden;display:flex;background:#f3f4f6}
+.poss-fill{height:100%;transition:width .8s ease}
+.poss-fill.home{background:var(--green)}
+.poss-fill.away{background:#3b82f6}
+.poss-pct{font-size:.9rem;font-weight:800;color:var(--text-main);min-width:38px}
+.poss-pct.left{text-align:right}
+.poss-pct.right{text-align:left}
+
+/* Info cards grid */
+.modal-cards-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;margin-bottom:1.25rem}
+@media(max-width:600px){.modal-cards-grid{grid-template-columns:1fr}}
+
+.stat-info-card{background:var(--bg);border-radius:18px;border:1px solid var(--card-border);padding:1.25rem}
+.sic-title{font-size:.8rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+
+/* Stat rows (home vs away bars) */
+.sic-rows{display:flex;flex-direction:column;gap:.75rem;margin-bottom:1rem}
+.sic-row{display:flex;flex-direction:column;gap:.25rem}
+.sic-row-label{display:flex;justify-content:space-between;font-size:.78rem;font-weight:700;color:var(--text-main)}
+.sic-bar-track{height:8px;border-radius:99px;background:#e5e7eb;position:relative;overflow:hidden}
+.sic-bar-home{position:absolute;left:0;top:0;height:100%;border-radius:99px;transition:width .8s ease}
+.sic-bar-away{position:absolute;right:0;top:0;height:100%;border-radius:99px;transition:width .8s ease}
+
+/* Mini metrics bottom row */
+.mini-metrics{display:flex;flex-wrap:wrap;gap:.75rem}
+.mini-metric{flex:1;min-width:130px;background:var(--bg);border:1px solid var(--card-border);border-radius:14px;padding:.8rem 1rem;display:flex;flex-direction:column;gap:.25rem}
+.mm-label{font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.mm-vals{display:flex;justify-content:space-between;align-items:center}
+.mm-v{font-size:1.1rem;font-weight:800;color:var(--text-main)}
+.mm-v.home{color:var(--green-dark)}
+.mm-v.away{color:#3b82f6}
+.mm-sep{font-size:.75rem;color:var(--muted-light);font-weight:600}
 </style>
 {% endblock %}
 
 {% block extra_js %}
 <script>
+/* ══════════════════════════════════════════════════════════
+   MATCH STATS MODAL
+   ══════════════════════════════════════════════════════════ */
+
+let _attackChart = null;
+let _defChart    = null;
+
 function showTab(id, btn) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
   document.getElementById('tab_' + id).classList.add('active');
   btn.classList.add('active');
+}
+
+function closeMatchModal() {
+  document.getElementById('matchModal').classList.remove('open');
+  if (_attackChart) { _attackChart.destroy(); _attackChart = null; }
+  if (_defChart)    { _defChart.destroy();    _defChart    = null; }
+}
+
+function closeModal(e) {
+  if (e.target === document.getElementById('matchModal')) closeMatchModal();
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMatchModal(); });
+
+function openMatchModal(matchId) {
+  const modal = document.getElementById('matchModal');
+  modal.classList.add('open');
+
+  // Reset state
+  document.getElementById('modalLoading').style.display = 'flex';
+  document.getElementById('modalStats').style.display   = 'none';
+  document.getElementById('mScore').textContent = '–';
+  if (_attackChart) { _attackChart.destroy(); _attackChart = null; }
+  if (_defChart)    { _defChart.destroy();    _defChart    = null; }
+
+  fetch(`/api/match/${matchId}`)
+    .then(r => r.json())
+    .then(m => populateModal(m))
+    .catch(() => {
+      document.getElementById('modalLoading').innerHTML =
+        '<p style="color:#ef4444">Failed to load match data.</p>';
+    });
+}
+
+function populateModal(m) {
+  // ── Header ──
+  document.getElementById('mFlag1').src  = m.team1.flag_url;
+  document.getElementById('mFlag2').src  = m.team2.flag_url;
+  document.getElementById('mFlag1').alt  = m.team1.name;
+  document.getElementById('mFlag2').alt  = m.team2.name;
+  document.getElementById('mName1').textContent = m.team1.name;
+  document.getElementById('mName2').textContent = m.team2.name;
+  document.getElementById('mScore').textContent =
+    m.status === 'FT' ? `${m.score1} – ${m.score2}` : 'VS';
+  document.getElementById('mStage').textContent = m.stage;
+  document.getElementById('mVenue').textContent  = m.venue || '';
+
+  const s = m.stats || {};
+
+  // ── Possession bar ──
+  const hp = s.home_possession || 0;
+  const ap = s.away_possession || 0;
+  const total = hp + ap || 100;
+  document.getElementById('possPct1').textContent = hp.toFixed(0) + '%';
+  document.getElementById('possPct2').textContent = ap.toFixed(0) + '%';
+  setTimeout(() => {
+    document.getElementById('possBar1').style.width = (hp / total * 100) + '%';
+    document.getElementById('possBar2').style.width = (ap / total * 100) + '%';
+  }, 80);
+
+  // ── Attack stat rows ──
+  const attackMetrics = [
+    { label:'Total Shots',    h: s.home_total_shots || 0, a: s.away_total_shots || 0, color:'#f59e0b' },
+    { label:'Shots on Target',h: s.home_sot || 0,         a: s.away_sot || 0,         color:'#10b981' },
+    { label:'Corners',        h: s.home_corners || 0,     a: s.away_corners || 0,     color:'#8b5cf6' },
+    { label:'Crosses',        h: s.home_crosses || 0,     a: s.away_crosses || 0,     color:'#3b82f6' },
+  ];
+  buildStatRows('attackRows', attackMetrics, '#10b981', '#f59e0b');
+
+  // ── Defence stat rows ──
+  const defMetrics = [
+    { label:'Saves',          h: s.home_saves || 0,         a: s.away_saves || 0,         color:'#3b82f6' },
+    { label:'Fouls',          h: s.home_fouls || 0,         a: s.away_fouls || 0,         color:'#ef4444' },
+    { label:'Interceptions',  h: s.home_interceptions || 0, a: s.away_interceptions || 0, color:'#06b6d4' },
+    { label:'Offsides',       h: s.home_offsides || 0,      a: s.away_offsides || 0,      color:'#ec4899' },
+  ];
+  buildStatRows('defenceRows', defMetrics, '#3b82f6', '#ef4444');
+
+  // ── Attack Chart ──
+  _attackChart = buildBarChart(
+    'attackModalChart',
+    m.team1.name, m.team2.name,
+    ['Shots','Shots on Target','Corners','Crosses'],
+    [s.home_total_shots||0, s.home_sot||0, s.home_corners||0, s.home_crosses||0],
+    [s.away_total_shots||0, s.away_sot||0, s.away_corners||0, s.away_crosses||0],
+    '#10b981', '#f59e0b'
+  );
+
+  // ── Defence Chart ──
+  _defChart = buildBarChart(
+    'defenceModalChart',
+    m.team1.name, m.team2.name,
+    ['Saves','Fouls','Interceptions','Offsides'],
+    [s.home_saves||0, s.home_fouls||0, s.home_interceptions||0, s.home_offsides||0],
+    [s.away_saves||0, s.away_fouls||0, s.away_interceptions||0, s.away_offsides||0],
+    '#3b82f6', '#ef4444'
+  );
+
+  // ── Mini metrics ──
+  const mini = [
+    { label:'Yellow Cards', h: s.home_cards_yellow||0, a: s.away_cards_yellow||0 },
+    { label:'Red Cards',    h: s.home_cards_red||0,    a: s.away_cards_red||0    },
+    { label:'Attendance',   h: m.attendance || '–',    a: '',   single: true     },
+    { label:'Notes',        h: m.notes || '–',         a: '',   single: true     },
+  ];
+  const mm = document.getElementById('miniMetrics');
+  mm.innerHTML = mini.map(x => `
+    <div class="mini-metric">
+      <div class="mm-label">${x.label}</div>
+      <div class="mm-vals">
+        ${x.single
+          ? `<span class="mm-v" style="font-size:.9rem;color:var(--text-main)">${x.h}</span>`
+          : `<span class="mm-v home">${x.h}</span>
+             <span class="mm-sep">vs</span>
+             <span class="mm-v away">${x.a}</span>`}
+      </div>
+    </div>`).join('');
+
+  // Show
+  document.getElementById('modalLoading').style.display = 'none';
+  document.getElementById('modalStats').style.display   = 'block';
+}
+
+/* ── Horizontal comparison bar rows ── */
+function buildStatRows(containerId, metrics, homeColor, awayColor) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = metrics.map(m => {
+    const maxVal = Math.max(m.h, m.a, 1);
+    const hPct   = (m.h / maxVal * 100).toFixed(1);
+    const aPct   = (m.a / maxVal * 100).toFixed(1);
+    return `
+    <div class="sic-row">
+      <div class="sic-row-label">
+        <span style="color:${homeColor}">${m.h}</span>
+        <span style="color:var(--muted);font-size:.72rem">${m.label}</span>
+        <span style="color:${awayColor}">${m.a}</span>
+      </div>
+      <div class="sic-bar-track">
+        <div class="sic-bar-home"  style="width:${hPct}%;background:${homeColor};opacity:.85"></div>
+        <div class="sic-bar-away"  style="width:${aPct}%;background:${awayColor};opacity:.7"></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Grouped bar chart (Chart.js) ── */
+function buildBarChart(canvasId, label1, label2, labels, data1, data2, color1, color2) {
+  const ctx = document.getElementById(canvasId).getContext('2d');
+  return new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: label1, data: data1, backgroundColor: color1, borderRadius: 6 },
+        { label: label2, data: data2, backgroundColor: color2, borderRadius: 6 },
+      ],
+    },
+    options: {
+      responsive: true,
+      animation: { duration: 700, easing: 'easeOutQuart' },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { color: '#6b7280', font: { family: 'Poppins', size: 11 }, boxWidth: 12 },
+        },
+        tooltip: {
+          backgroundColor: '#1f2937',
+          titleColor: '#f9fafb',
+          bodyColor: '#d1fae5',
+          padding: 10,
+          cornerRadius: 8,
+        },
+      },
+      scales: {
+        x: { ticks: { color: '#9ca3af', font: { family: 'Poppins', size: 10 } }, grid: { display: false } },
+        y: { ticks: { color: '#9ca3af', font: { family: 'Poppins', size: 10 } }, grid: { color: '#f3f4f6' }, beginAtZero: true },
+      },
+    },
+  });
 }
 </script>
 {% endblock %}

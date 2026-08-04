@@ -87,15 +87,15 @@
       </div>
       <div class="match-teams">
         <div class="team-side">
-          <span class="flag lg">{{ m.team1.flag }}</span>
+          <img src="{{ m.team1.flag_url }}" alt="{{ m.team1.name }}" class="match-flag" loading="lazy" onerror="this.style.display='none'">
           <span class="tname">{{ m.team1.name }}</span>
         </div>
         <div class="score-box">
           <span class="score">{{ m.score1 }} – {{ m.score2 }}</span>
         </div>
         <div class="team-side right">
-          <span class="flag lg">{{ m.team2.flag }}</span>
           <span class="tname">{{ m.team2.name }}</span>
+          <img src="{{ m.team2.flag_url }}" alt="{{ m.team2.name }}" class="match-flag" loading="lazy" onerror="this.style.display='none'">
         </div>
       </div>
       <div class="match-meta"><i class="fa fa-location-dot"></i> {{ m.venue }}</div>

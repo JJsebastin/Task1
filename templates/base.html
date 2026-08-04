@@ -26,7 +26,7 @@
     <a href="{{ url_for('main.index') }}" class="nav-brand">
       <span class="brand-icon">⚽</span>
       <span class="brand-text">Play<span class="accent">Stats</span></span>
-      <span class="badge-live">🇪🇸 Spain Champions</span>
+      <a href="{{ url_for('main.visualization') }}#spain-champions" class="badge-live" style="text-decoration:none">🇪🇸 Spain Champions</a>
     </a>
     <div class="nav-links">
       <a href="{{ url_for('main.index') }}"         class="nav-link {% if request.endpoint=='main.index' %}active{% endif %}"><i class="fa fa-home"></i> Home</a>
