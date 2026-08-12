@@ -68,9 +68,16 @@
       <span class="p-rank-num"></span>
       <span class="p-pos-badge {{ p.pos|lower }}">{{ p.pos }}</span>
     </div>
-    <div class="pc-country-block">
+    <div class="pc-avatar-section">
+      <div class="pc-avatar-ring">
+        {% if p.image_url %}
+        <img src="{{ p.image_url }}" alt="{{ p.name }}" class="pc-avatar-img" loading="lazy" onerror="this.src='https://ui-avatars.com/api/?name={{ p.name|urlencode }}&background=0d9668&color=fff&size=80&rounded=true&bold=true'">
+        {% else %}
+        <img src="https://ui-avatars.com/api/?name={{ p.name|urlencode }}&background=0d9668&color=fff&size=80&rounded=true&bold=true" alt="{{ p.name }}" class="pc-avatar-img" loading="lazy">
+        {% endif %}
+      </div>
       {% if p.flag_url %}
-      <img src="{{ p.flag_url }}" alt="{{ p.team }}" class="pc-flag-img" loading="lazy">
+      <img src="{{ p.flag_url }}" alt="{{ p.team }}" class="pc-flag-badge" loading="lazy">
       {% endif %}
     </div>
     <div class="pc-name">{{ p.name }}</div>

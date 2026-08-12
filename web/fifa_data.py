@@ -315,6 +315,16 @@ def _build_players():
                     "gk_goals_against":_safe_float(row.get("gk_goals_against")),
                 }
 
+                # Check for local image first
+                local_img_url = ""
+                local_base = os.path.join(os.path.dirname(__file__), "..", "static", "images", "players")
+                for ext in [".png", ".jpg", ".jpeg", ".webp"]:
+                    if os.path.exists(os.path.join(local_base, f"{name}{ext}")):
+                        local_img_url = f"/static/images/players/{name}{ext}"
+                        break
+                        
+                final_img_url = local_img_url or (row.get("image_url") or "").strip()
+
                 out.append({
                     "id": i + 1,
                     "name": name,
@@ -322,6 +332,7 @@ def _build_players():
                     "flag": FLAGS.get(team, "🏳️"),
                     "code": code.upper(),
                     "flag_url": f"{_CDN}/{code}.png",
+                    "image_url": final_img_url,
                     "pos": pos,
                     "goals": goals,
                     "assists": assists,

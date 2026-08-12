@@ -1,5 +1,5 @@
 """
-app.py  –  PlayStats Flask Web App
+app.py  –  PlayStats Flask Web App (Auto-Reload Triggered)
 Run:  python app.py
 """
 from flask import Flask

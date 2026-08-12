@@ -52,7 +52,7 @@
 <!-- Final Highlight -->
 <section class="section">
   <h2 class="section-title"><i class="fa fa-trophy"></i> The Final – July 19, 2026</h2>
-  <div class="final-card tilt-card" data-tilt data-tilt-max="5">
+  <a href="/visualization" class="final-card tilt-card" data-tilt data-tilt-max="5" style="display: block; text-decoration: none; color: inherit;">
     <div class="final-badge">MetLife Stadium · New Jersey · Att: 80,663</div>
     <div class="final-teams">
       <div class="final-team">
@@ -71,38 +71,9 @@
         <span class="final-tag runner">Runner-up</span>
       </div>
     </div>
-  </div>
+  </a>
 </section>
 
-<!-- Recent Knockout Matches -->
-<section class="section">
-  <h2 class="section-title"><i class="fa fa-clock"></i> Recent Results</h2>
-  <div class="match-grid">
-    {% for m in recent|reverse %}
-    <div class="match-card tilt-card" data-tilt data-tilt-max="8">
-      <div class="match-top-row">
-        <span class="match-stage-badge">{{ m.stage }}</span>
-        <span class="match-date">{{ m.date }}</span>
-        <span class="status-badge ft">FT</span>
-      </div>
-      <div class="match-teams">
-        <div class="team-side">
-          <img src="{{ m.team1.flag_url }}" alt="{{ m.team1.name }}" class="match-flag" loading="lazy" onerror="this.style.display='none'">
-          <span class="tname">{{ m.team1.name }}</span>
-        </div>
-        <div class="score-box">
-          <span class="score">{{ m.score1 }} – {{ m.score2 }}</span>
-        </div>
-        <div class="team-side right">
-          <span class="tname">{{ m.team2.name }}</span>
-          <img src="{{ m.team2.flag_url }}" alt="{{ m.team2.name }}" class="match-flag" loading="lazy" onerror="this.style.display='none'">
-        </div>
-      </div>
-      <div class="match-meta"><i class="fa fa-location-dot"></i> {{ m.venue }}</div>
-    </div>
-    {% endfor %}
-  </div>
-</section>
 
 <!-- Golden Boot Race -->
 <section class="section">

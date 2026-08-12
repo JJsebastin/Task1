@@ -172,6 +172,12 @@ a{color:inherit;text-decoration:none}
 .scorer-flag-img{width:36px;height:27px;object-fit:cover;border-radius:4px;box-shadow:0 2px 6px rgba(0,0,0,.1)}
 .pc-minutes{font-size:.78rem;color:var(--muted);font-weight:600;background:var(--bg);border:1px solid var(--card-border);padding:.45rem 1.1rem;border-radius:99px;display:flex;align-items:center;gap:.4rem}
 .pc-minutes i{color:var(--green)}
+/* Player card avatar ring & badge */
+.pc-avatar-section{display:flex;flex-direction:column;align-items:center;position:relative;margin:.3rem 0 .6rem}
+.pc-avatar-ring{width:68px;height:68px;border-radius:50%;padding:3px;background:linear-gradient(135deg,#10b981,#059669,#047857);box-shadow:0 4px 16px rgba(16,185,129,.3);transition:transform .3s ease,box-shadow .3s ease}
+.player-card:hover .pc-avatar-ring{transform:scale(1.08);box-shadow:0 6px 24px rgba(16,185,129,.45)}
+.pc-avatar-img{width:100%;height:100%;object-fit:cover;border-radius:50%;display:block;border:2px solid var(--card)}
+.pc-flag-badge{position:absolute;bottom:-2px;right:calc(50% - 38px);width:22px;height:16px;object-fit:cover;border-radius:3px;border:2px solid var(--card);box-shadow:0 2px 4px rgba(0,0,0,.15)}
 
 /* ─── Filter bar ─────────────────────────────────────────────────────────── */
 .filter-bar{display:flex;align-items:center;flex-wrap:wrap;gap:1rem;padding:.5rem;margin-bottom:2rem;background:#fff;border-radius:99px;border:1px solid var(--card-border);box-shadow:var(--shadow-sm)}
