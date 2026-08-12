@@ -1,4 +1,4 @@
-# ⚽ PlayStats — FIFA World Cup 2026 Analytics Platform
+# PlayStats — FIFA World Cup 2026 Analytics Platform
 
 > A full-stack Flask web application for exploring **complete FIFA World Cup 2026** match data, player statistics, group standings, and interactive visualizations — with a modern, OneFootball-inspired light-mode UI.
 
